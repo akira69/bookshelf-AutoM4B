@@ -1,0 +1,2 @@
+#!/bin/sh
+exec php /opt/m4b-tool/m4b-tool.phar "$@"

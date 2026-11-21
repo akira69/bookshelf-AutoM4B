@@ -14,7 +14,7 @@ book you will need multiple instances.
 
 The container listens on port 8787 and expects a volume mounted at `/config`.
 
-    docker run -p 8787:8787 -v ~/.config/bookshelf:/config ghcr.io/pennydreadful/bookshelf:hardcover
+    docker run -p 8787:8787 -v ~/.config/bookshelf:/config ghcr.io/akira69/bookshelf-autom4b:softcover
 
 The `softcover` tags use [Goodreads](https://www.goodreads.com) as the metadata
 provider. The quality of this metadata is generally poor and contains a lot of
@@ -29,8 +29,8 @@ Goodreads list imports haven't been tested and likely don't work.
 ## Automatic M4B Conversion
 
 Bookshelf can combine incoming audiobook files into a single M4B before
-importing them. To enable it, install `m4b-tool`, PHP, FFmpeg, and FFprobe in
-the Bookshelf environment, then turn on **Convert Audiobooks to M4B** under
+importing them. The Docker image includes `m4b-tool`, PHP, FFmpeg, FFprobe,
+and the MP4 chapter/tagging tools. Turn on **Convert Audiobooks to M4B** under
 **Settings > Media Management**. The m4b-tool path defaults to `m4b-tool` on
 `PATH`; you can also configure a custom executable path or a `.phar` file.
 `mp4chaps` is optional, but can provide additional chapter support.
@@ -40,6 +40,12 @@ jobs, chapter options, source artwork, and extra m4b-tool arguments. Sidecar
 `chapters.txt`, `description.txt`, and cover images are used when available.
 Converted source files can be kept, deleted after a successful import, or
 handled according to the import mode.
+
+Set **M4B Conversion Working Directory** to a directory on local SSD storage
+mounted into the container, for example `/scratch/readarr/work`. Source audio
+is copied there before conversion, and the completed M4B is imported into the
+library afterward. Keep `/config` on persistent storage; conversion scratch
+space is temporary. Select **Keep** for source file handling to retain originals.
 
 To convert audiobooks that are already in your library, enable conversion and
 use **Convert Existing Audio to M4B** in the same settings page. Books already

@@ -131,6 +131,26 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build M4B runtime smoke-test image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: bookshelf-m4b-smoke:ci
+          build-args: |
+            GIT_BRANCH=${{ env.BUILD_SOURCEBRANCHNAME }}
+            COMMIT_HASH=${{ github.event.pull_request.head.sha || github.sha }}
+            BUILD_DATE=${{ env.DATE }}
+
+      - name: Test M4B conversion without network or library access
+        run: >-
+          docker run --rm --network none --user 568:568 --entrypoint sh
+          --tmpfs /tmp:rw,mode=1777
+          -v "$PWD/docker/tests:/tests:ro"
+          bookshelf-m4b-smoke:ci /tests/m4b-runtime.sh
+
       - uses: docker/build-push-action@v6
         with:
           context: .
